@@ -45,11 +45,8 @@ changeElem :: [[a]] -> (Int, Int) -> a -> [[a]]
 changeElem (xs:ys) (0, col) e = [take col xs ++ [e] ++ drop (col + 1) xs] ++ ys
 changeElem (xs:ys) (row, col) e = [xs] ++ changeElem ys ((row - 1), col) e
 
+makeMove :: Mark -> (Int, Int) -> Game -> Game
+makeMove mark (row, col) (Game size rows) = Game {size = size, rows = changeElem rows (row, col) mark}
 
-makeMove :: (Mark, Pos) -> Game -> Game
-makeMove (mark, pos) (Game size rows) = Game size newRows
-    where
-        columnIndex = mod size pos
-        rowIndex = div (size - columnIndex) size
-        newRows = changeElem rows (rowIndex, columnIndex) mark
-
+isBlank :: Game -> (Int, Int) -> Bool
+isBlank Game {rows = rows} (row, col) = (rows !! row) !! col == Blank
