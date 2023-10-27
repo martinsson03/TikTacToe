@@ -5,13 +5,12 @@ import Interaction
 data Tree a = Node a [Tree a] deriving (Show, Eq)
 
 makeTree :: Game -> Mark -> (Tree Game)
-makeTree Game {size = size, rows = rows} mark = Node (Game size rows) (makeNodes (Game size rows) mark)
+makeTree Game {size = size, rows = rows} mark = undefined
 
-makeNodes :: Tree Game -> Mark -> [Tree Game]
-makeNodes (Node game []) mark = Node allMoves
 
-allMoves :: Game -> Mark -> [Game]
-allMoves Game {size = size, rows = rows} mark = go (0, 0) (Game size rows) mark
+
+allMoves :: Game -> Mark -> Tree Game
+allMoves Game {size = size, rows = rows} mark = undefined
     where
         go :: (Int, Int) -> Game -> Mark -> [Game]
         go (row, col) g@(Game size rows) mark
