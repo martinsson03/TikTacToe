@@ -68,7 +68,7 @@ play game = do
             x <- readLn
             case winner (makeMove Naught (y-1,x-1) game) of
                 Just Naught -> putStrLn $ show (makeMove Naught (y-1,x-1) game) ++ "\nYou won congrats"
-                Nothing -> do
+                Nothing -> do -- Behöver ett scenario för No Winner här
                     newGame <- generate (makeRandomMove (makeMove Naught (y-1,x-1) game))
                     play newGame
         Just Cross -> putStrLn $ (show game) ++ "\nComputer won"
