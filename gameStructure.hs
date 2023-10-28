@@ -6,7 +6,7 @@ import Data.List
 type Pos = Int
 data Mark = Cross | Naught | Blank deriving Eq
 type Row = [Mark]
-data Game = Game {size :: Int, rows :: [Row]}
+data Game = Game {size :: Int, rows :: [Row]} deriving Eq
 
 instance Show Mark where
     show mark = case mark of
@@ -31,25 +31,23 @@ allBlank :: Int -> Game
 allBlank n = Game n $ replicate n (replicate n Blank)
 
 allRows :: Game -> [Row]
-allRows (Game _ rows) = rows ++ transpose rows ++ [diagonal rows] ++[diagonal $ map reverse rows]
+allRows (Game _ rows) = rows ++ transpose rows ++ [diagonal rows] ++ [diagonal $ map reverse rows]
     where
         diagonal r = [row !! index | (row, index) <- zip r [0..]]
 
-winner :: Game -> (Game, Maybe Mark)
+winner :: Game -> Maybe Mark
 winner g@(Game _ rows)
-    | elem [Naught, Naught, Naught] $ allRows g = (g, Just Naught)
-    | elem [Cross, Cross, Cross] $ allRows g = (g, Just Cross)
-    | otherwise = (g, Nothing)
+    | elem [Naught, Naught, Naught] $ allRows g = Just Naught
+    | elem [Cross, Cross, Cross] $ allRows g = Just Cross
+    | otherwise = Nothing
 
 changeElem :: [[a]] -> (Int, Int) -> a -> [[a]]
 changeElem (xs:ys) (0, col) e = [take col xs ++ [e] ++ drop (col + 1) xs] ++ ys
 changeElem (xs:ys) (row, col) e = [xs] ++ changeElem ys ((row - 1), col) e
 
+makeMove :: Mark -> (Int, Int) -> Game -> Game
+makeMove mark (row, col) (Game size rows) = Game {size = size, rows = changeElem rows (row, col) mark}
 
-makeMove :: (Mark, Pos) -> Game -> Game
-makeMove (mark, pos) (Game size rows) = Game size newRows
-    where
-        columnIndex = mod size pos
-        rowIndex = div (size - columnIndex) size
-        newRows = changeElem rows (rowIndex, columnIndex) mark
+isBlank :: Game -> (Int, Int) -> Bool
+isBlank Game {rows = rows} (row, col) = (rows !! row) !! col == Blank
 
