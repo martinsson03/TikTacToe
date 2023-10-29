@@ -111,3 +111,4 @@ makeRandomMove :: Game -> Gen (Game)
 makeRandomMove game = do
     n <- choose (0, length (allnextMove game (allMoves (createGame 3) Cross))) -- (length (allnextMove game (allMoves (createGame 3) Naught))))
     return ((allnextMove game (allMoves (createGame 3) Cross)) !! n)
+
