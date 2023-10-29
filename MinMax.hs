@@ -7,6 +7,12 @@ import Data.Maybe
 
 data Tree a = Node a [Tree a] deriving (Show, Eq)
 
+getPoints :: Tree (Int, Game) -> Int
+getPoints (Node (n, _) _) = n
+
+getGame :: Tree (Int, Game) -> Game
+getGame (Node (_, g) _) = g
+ 
 makeTree :: Game -> Mark -> Tree Game
 makeTree g@(Game {size = size, rows = rows}) mark = case not ( any (==Blank) $ concat rows) of
     True    -> Node g [] -- When all squares are marked, the game has terminated
@@ -34,12 +40,19 @@ calcMinMax (Node game list) mark = case list of
         rem = map (\x -> calcMinMax x mark) list
         sumPoints = foldr (\(Node (x, y) _) acc -> acc + x) 0 rem
 
--- Gets the best possible move 
+
+-- Gets the best possible move for a game and a mark
 bestMove :: Game -> Mark -> Game
-bestMove g@(Game {size = size, rows = rows}) mark = undefined
+bestMove g@(Game {size = size, rows = rows}) mark = maxGame
     where
-        pointsTree = calcMinMax $ makeTree g mark
-        maxGame = undefined
+        pointsTree = calcMinMax (makeTree g mark) mark
+        maxGame = go pointsTree []
+
+        go :: Tree (Int, Game) -> [(Int, Game)] -> Game
+        go (Node _ []) [(accPoints, accGame)] = accGame
+        go (Node p (x:xs)) [(accPoints, accGame)] 
+            | getPoints x >= accPoints = go (Node p xs) [(getPoints x, getGame x)]
+            | otherwise = go (Node p xs) [(accPoints, accGame)]
 
 
 allnextMove :: Game -> [Game] -> [Game]
