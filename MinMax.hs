@@ -8,7 +8,9 @@ import Data.Maybe
 data Tree a = Node a [Tree a] deriving (Show, Eq)
 
 makeTree :: Game -> Mark -> (Tree Game)
-makeTree Game {size = size, rows = rows} mark = undefined
+makeTree g@(Game {size = size, rows = rows}) mark = case all (/=Blank) $ concat rows of
+    True    -> Node g [] -- When all squares are marked, the game has terminated
+    _       -> Node g (map (makeTree (oppositeMark mark)) (allMoves g (oppositeMark mark)))
 
 
 allMoves :: Game -> Mark -> [Game]
@@ -21,6 +23,12 @@ allMoves Game {size = size, rows = rows} mark = go (0,0) (Game size rows) mark
             | otherwise = case isBlank g (y, x) of
                 True        -> [makeMove mark (y, x) g] ++ go (y, x + 1) g mark
                 _           -> go (y, x + 1) g mark
+-- MinMax algoritm:
+-- If cross +1, if naught -1
+calcMinMax :: Tree Game -> Tree Int
+calcMinMax (Node game list) = case list of
+    []  -> case winner game of
+        Just a  -> if a == Naught then Node 1 [] else Node (-1) []
 
 allnextMove :: Game -> [Game] -> [Game]
 allnextMove currentgame allnewmoves =  removeItem currentgame (nub [combine currentgame nmove | nmove <- (allnewmoves)])
@@ -48,26 +56,30 @@ together Naught Blank   = Naught
 together x y            = x 
 
 
-playGame :: IO ()
-playGame = do 
+main :: IO ()
+main = do 
     putStrLn (show (createGame 3))
-    putStrLn "Lets play 3 i rad you are Naught and Computer is Cross \nGive a coordinate to place (0-2,0-2):"
-    pos <- readLn
-    p <- generate (makeRandomMove (makeMove Naught pos (createGame 3)))
+    putStrLn "Lets play 3 i rad you are Naught and Computer is Cross \nWhats your move? Row: (1-3)"
+    y <- readLn
+    putStrLn "Collom: (1-3):"
+    x <- readLn
+    p <- generate (makeRandomMove (makeMove Naught (y-1,x-1) (createGame 3)))
     play p
     
 play :: Game -> IO ()
 play game = do 
     case winner game of
         Nothing -> do
-            putStrLn ("The computer played\n" ++ show game ++ "\n Whats your move? Row: 0-2 Collom: 0-2)\n")
-            pos <- readLn
-            case winner (makeMove Naught pos game) of
-                Just Naught -> putStrLn "You won congrats"
-                Nothing -> do
-                    newGame <- generate (makeRandomMove (makeMove Naught pos game))
+            putStrLn $ (show game) ++ "\nWhats your move? Row: (1-3)"
+            y <- readLn
+            putStrLn "Collom: (1-3):"
+            x <- readLn
+            case winner (makeMove Naught (y-1,x-1) game) of
+                Just Naught -> putStrLn $ show (makeMove Naught (y-1,x-1) game) ++ "\nYou won congrats"
+                Nothing -> do -- Behöver ett scenario för No Winner här
+                    newGame <- generate (makeRandomMove (makeMove Naught (y-1,x-1) game))
                     play newGame
-        Just Cross -> putStrLn "Computer won"
+        Just Cross -> putStrLn $ (show game) ++ "\nComputer won"
         
 
 makeRandomMove :: Game -> Gen (Game)

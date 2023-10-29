@@ -8,6 +8,10 @@ data Mark = Cross | Naught | Blank deriving Eq
 type Row = [Mark]
 data Game = Game {size :: Int, rows :: [Row]} deriving Eq
 
+oppositeMark :: Mark -> Mark
+oppositeMark Cross = Naught
+oppositeMark Naught = Cross
+
 instance Show Mark where
     show mark = case mark of
         Cross   -> "X"
