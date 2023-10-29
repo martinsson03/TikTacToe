@@ -7,8 +7,8 @@ import Data.Maybe
 
 data Tree a = Node a [Tree a] deriving (Show, Eq)
 
-makeTree :: Game -> Mark -> (Tree Game)
-makeTree g@(Game {size = size, rows = rows}) mark = case all (/=Blank) $ concat rows of
+makeTree :: Game -> Mark -> Tree Game
+makeTree g@(Game {size = size, rows = rows}) mark = case not ( any (==Blank) $ concat rows) of
     True    -> Node g [] -- When all squares are marked, the game has terminated
     _       -> Node g (map (\x -> (makeTree x (oppositeMark mark))) (allMoves g (oppositeMark mark)))
 
@@ -24,12 +24,23 @@ allMoves Game {size = size, rows = rows} mark = go (0,0) (Game size rows) mark
                 True        -> [makeMove mark (y, x) g] ++ go (y, x + 1) g mark
                 _           -> go (y, x + 1) g mark
 -- MinMax algoritm:
--- If cross +1, if naught -1
-calcMinMax :: Tree Game -> Tree Int
-calcMinMax (Node game list) = case list of
+-- Gets AI:s mark and calcs points to each move
+calcMinMax :: Tree Game -> Mark -> Tree (Int, Game)
+calcMinMax (Node game list) mark = case list of
     []  -> case winner game of
-        Just a  -> if a == Naught then Node 1 [] else Node (-1) []
-    _   -> Node 0 $ map calcMinMax list
+        Just a  -> if a == mark then Node (1, game) [] else Node (-1, game) []
+    _   -> Node (sumPoints, game) rem 
+    where
+        rem = map (\x -> calcMinMax x mark) list
+        sumPoints = foldr (\(Node (x, y) _) acc -> acc + x) 0 rem
+
+-- Gets the best possible move 
+bestMove :: Game -> Mark -> Game
+bestMove g@(Game {size = size, rows = rows}) mark = undefined
+    where
+        pointsTree = calcMinMax $ makeTree g mark
+        maxGame = undefined
+
 
 allnextMove :: Game -> [Game] -> [Game]
 allnextMove currentgame allnewmoves =  removeItem currentgame (nub [combine currentgame nmove | nmove <- (allnewmoves)])
