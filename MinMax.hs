@@ -10,7 +10,7 @@ data Tree a = Node a [Tree a] deriving (Show, Eq)
 makeTree :: Game -> Mark -> (Tree Game)
 makeTree g@(Game {size = size, rows = rows}) mark = case all (/=Blank) $ concat rows of
     True    -> Node g [] -- When all squares are marked, the game has terminated
-    _       -> Node g (map (makeTree (oppositeMark mark)) (allMoves g (oppositeMark mark)))
+    _       -> Node g (map (\x -> (makeTree x (oppositeMark mark))) (allMoves g (oppositeMark mark)))
 
 
 allMoves :: Game -> Mark -> [Game]
@@ -29,6 +29,7 @@ calcMinMax :: Tree Game -> Tree Int
 calcMinMax (Node game list) = case list of
     []  -> case winner game of
         Just a  -> if a == Naught then Node 1 [] else Node (-1) []
+    _   -> Node 0 $ map calcMinMax list
 
 allnextMove :: Game -> [Game] -> [Game]
 allnextMove currentgame allnewmoves =  removeItem currentgame (nub [combine currentgame nmove | nmove <- (allnewmoves)])
