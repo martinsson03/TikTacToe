@@ -55,3 +55,5 @@ makeMove mark (row, col) (Game size rows) = Game {size = size, rows = changeElem
 isBlank :: Game -> (Int, Int) -> Bool
 isBlank Game {rows = rows} (row, col) = (rows !! row) !! col == Blank
 
+isFull :: Game -> Bool
+isFull Game {rows = rows} = all (/=Blank) $ concat rows
