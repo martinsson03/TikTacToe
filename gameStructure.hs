@@ -18,6 +18,10 @@ instance Show Mark where
         Naught  -> "O"
         Blank   -> "_"
 
+readMark :: String -> Mark
+readMark str
+    | (toLower $ head str) == 'c' = Cross
+    | otherwise = Naught
 
 instance Show Game where
     show (Game _ rows) = unlines [unwords [show mark | mark <- row]| row <- rows]

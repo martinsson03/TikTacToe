@@ -49,6 +49,7 @@ bestMove g@(Game {size = size, rows = rows}) mark = maxGame
         maxGame = go pointsTree []
 
         go :: Tree (Int, Game) -> [(Int, Game)] -> Game
+        go (Node (int, game) list) list2 = error $ "int =" ++ show int ++ " game = " ++ show game ++ " list = " ++ show list ++ " list2 = " ++ show list2
         go (Node _ []) [(accPoints, accGame)] = accGame
         go (Node p (x:xs)) [(accPoints, accGame)] 
             | getPoints x >= accPoints = go (Node p xs) [(getPoints x, getGame x)]
