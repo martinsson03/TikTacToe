@@ -16,7 +16,7 @@ getGame (Node (_, g) _) = g
 makeTree :: Game -> Mark -> Tree Game
 makeTree g@(Game {size = size, rows = rows}) mark = case not ( any (==Blank) $ concat rows) of
     True    -> Node g [] -- When all squares are marked, the game has terminated
-    _       -> Node g (map (\x -> (makeTree x (oppositeMark mark))) (allMoves g (oppositeMark mark)))
+    _       -> Node g (map (\x -> (makeTree x mark)) (allMoves g (oppositeMark mark)))
 
 
 allMoves :: Game -> Mark -> [Game]
@@ -36,7 +36,7 @@ calcMinMax (Node game list) mark = case list of
     []  -> case winner game of
         Just a  -> if a == mark then Node (1, game) [] else Node (-1, game) []
         _       -> Node (0, game) []
-    _   -> Node (sumPoints, game) rem 
+    _   -> Node (sumPoints, game) rem
     where
         rem = map (\x -> calcMinMax x mark) list
         sumPoints = foldr (\(Node (x, y) _) acc -> acc + x) 0 rem

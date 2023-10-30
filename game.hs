@@ -2,6 +2,8 @@ import GameStructure
 import MinMax
 import Data.Char
 
+testGame2 :: Game
+testGame2 = Game {size = 3, rows = [[Cross, Cross, Blank], [Blank, Blank, Blank], [Blank, Blank, Blank]]}
 
 
 mainn :: IO ()
@@ -40,4 +42,4 @@ makeMoveUser (game, mark) = do
     return (makeMove mark input game)
 
 makeMoveAi :: (Game, Mark) -> Game
-makeMoveAi (game, mark) = bestMove game mark
+makeMoveAi (game, mark) = bestMove game (oppositeMark mark)
