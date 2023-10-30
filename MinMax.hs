@@ -35,6 +35,7 @@ calcMinMax :: Tree Game -> Mark -> Tree (Int, Game)
 calcMinMax (Node game list) mark = case list of
     []  -> case winner game of
         Just a  -> if a == mark then Node (1, game) [] else Node (-1, game) []
+        _       -> Node (0, game) []
     _   -> Node (sumPoints, game) rem 
     where
         rem = map (\x -> calcMinMax x mark) list
@@ -49,8 +50,9 @@ bestMove g@(Game {size = size, rows = rows}) mark = maxGame
         maxGame = go pointsTree []
 
         go :: Tree (Int, Game) -> [(Int, Game)] -> Game
-        go (Node (int, game) list) list2 = error $ "int =" ++ show int ++ " game = " ++ show game ++ " list = " ++ show list ++ " list2 = " ++ show list2
+--        go (Node (int, game) list) list2 = error $ "int =" ++ show int ++ " game = " ++ show game ++ " list = " ++ show list ++ " list2 = " ++ show list2
         go (Node _ []) [(accPoints, accGame)] = accGame
+        go (Node p (x:xs)) [] = go (Node p xs) [(getPoints x, getGame x)]
         go (Node p (x:xs)) [(accPoints, accGame)] 
             | getPoints x >= accPoints = go (Node p xs) [(getPoints x, getGame x)]
             | otherwise = go (Node p xs) [(accPoints, accGame)]

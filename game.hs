@@ -15,8 +15,10 @@ mainn = do
     case winner winGame of
         Just a      -> do
             putStrLn $ show a ++ " is the winner!!"
-        _           ->
+            print winGame
+        _           -> do
             putStrLn "Its a tie!"
+            print winGame
         
 
 
